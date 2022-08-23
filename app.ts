@@ -1,12 +1,14 @@
 import express,{Express,Request,Response} from 'express';
+import morgan from "morgan"
 
 const app:Express = express()
-const port = 5000
+
+if(process.env.NODE_ENV === "development"){
+  app.use(morgan("dev"))
+}
 
 app.get('/', (req:Request, res:Response) => {
   res.send('Hello World!')
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+export default app;
