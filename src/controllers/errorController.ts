@@ -11,8 +11,14 @@ const handleValidationError = (err: any) => {
 };
 
 const handleDuplicateIdsError = (err: any) => {
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-  const message = `Duplicate field value:${value}. Please use another value!`;
+  // const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+  const keys: string[] = [];
+  for (const [key, val] of Object.entries(err.keyValue)) {
+    keys.push(key);
+  }
+  const message = `Duplicate field value:${keys.join(
+    ","
+  )}. Please use another value!`;
   return new AppError(400, message);
 };
 
@@ -21,7 +27,7 @@ const handleCastError = (err: any) => {
   return new AppError(400, message);
 };
 
-const sendErrDev = (err: AppError, res: Response) => {
+const sendErrDev = (err: any, res: Response) => {
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
@@ -62,7 +68,7 @@ const globalErrorHandler = (
   err.statusCode = err.statusCode || 500;
 
   if (process.env.NODE_ENV === "development") {
-    sendErrDev(err, res);
+    return sendErrDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
 
