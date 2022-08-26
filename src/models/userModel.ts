@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -25,9 +26,25 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) return next();
+//Password validation middleware------------------------------------------
+userSchema.pre("validate", function (next) {
+  if (this.password !== this.passwordConfirm) {
+    this.invalidate("passwordConfirm", "must match password");
+  }
+  next();
 });
+//-----------------------------------------------------------------------
+
+//Mongoose document middleware to encrypt the password before saving----
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // we dont want passwordConfirm to be stored in database.
+  this.passwordConfirm = undefined!;
+});
+//----------------------------------------------------------------------
 
 const User = mongoose.model("User", userSchema);
 
