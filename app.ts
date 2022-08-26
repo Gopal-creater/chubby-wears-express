@@ -31,8 +31,8 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 //------------------------------------------------------------------------
 
-// Error Handling middleware---------------------------------------------------
+// Error Handling middleware---
 app.use(globalErrorHandler);
-//-----------------------------------------------------------------------------
+//-----------------------------
 
 export default app;

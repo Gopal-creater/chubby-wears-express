@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import AppError from "../utils/appError";
 
 const handleValidationError = (err: any) => {
@@ -7,6 +8,7 @@ const handleValidationError = (err: any) => {
   );
 
   const message = `Invalid input data. ${errors.join(". ")}`;
+  console.log("message");
   return new AppError(400, message);
 };
 
@@ -36,7 +38,7 @@ const sendErrDev = (err: any, res: Response) => {
   });
 };
 
-const sendErrProd = (err: AppError, res: Response) => {
+const sendErrProd = (err: any, res: Response) => {
   //Operational,trusted error: send message to client
   if (err.isOperational) {
     res.status(err.statusCode).json({
@@ -46,7 +48,7 @@ const sendErrProd = (err: AppError, res: Response) => {
 
     //Programming or other unknown error:don't leak error details
   } else {
-    console.error("Programming or other unknown----------", err);
+    console.error("Programming or other unknown----------");
 
     res.status(500).json({
       status: "error",
@@ -68,18 +70,19 @@ const globalErrorHandler = (
   err.statusCode = err.statusCode || 500;
 
   if (process.env.NODE_ENV === "development") {
-    return sendErrDev(err, res);
+    sendErrDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
+    let error: any = { ...err, message: err.message };
 
     //Handle the cast Error
-    if (error.name === "CastError") error = handleCastError(error);
+    if (err instanceof mongoose.Error.CastError) error = handleCastError(error);
 
     //Handle Duplicate Id Error
     if (error.code === 11000) error = handleDuplicateIdsError(error);
 
     //Handle validation error from mongodb
-    if (error.name === "ValidationError") error = handleValidationError(error);
+    if (err instanceof mongoose.Error.ValidationError)
+      error = handleValidationError(error);
 
     sendErrProd(error, res);
   }
