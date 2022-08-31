@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import { IUserDocument } from "../interfaces/userInterfaces";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<IUserDocument>({
   name: {
     type: String,
     required: [true, "Please tell us your name"],
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
     minlenght: 8,
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -33,19 +35,31 @@ userSchema.pre("validate", function (next) {
   }
   next();
 });
-//-----------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 //Mongoose document middleware to encrypt the password before saving----
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password.toString(), 12);
 
   // we dont want passwordConfirm to be stored in database.
   this.passwordConfirm = undefined!;
 });
 //----------------------------------------------------------------------
 
-const User = mongoose.model("User", userSchema);
+//Mongoose instance method to compare password--------------------
+userSchema.methods.comparePassword = async function (
+  candidatePassword: String,
+  userPassword: String
+): Promise<boolean> {
+  return await bcrypt.compare(
+    candidatePassword.toString(),
+    userPassword.toString()
+  );
+};
+//-----------------------------------------------------------------
+
+const User = mongoose.model<IUserDocument>("User", userSchema);
 
 export default User;

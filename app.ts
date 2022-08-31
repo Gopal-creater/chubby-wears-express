@@ -1,6 +1,7 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import globalErrorHandler from "./src/controllers/errorController";
+import productRouter from "./src/routes/productRoutes";
 import userRouter from "./src/routes/userRoutes";
 import AppError from "./src/utils/appError";
 
@@ -20,9 +21,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-//Mounting our Routes-----------------
+//Mounting our Routes-----------------------
 app.use("/api/v1/users", userRouter);
-//------------------------------------
+app.use("/api/v1/products", productRouter);
+//------------------------------------------
 
 //Handling the other routes which are not cached above--------------------
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

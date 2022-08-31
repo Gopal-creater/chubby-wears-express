@@ -29,6 +29,10 @@ const handleCastError = (err: any) => {
   return new AppError(400, message);
 };
 
+const handleJsonWebTokenError = (err: any) => {
+  return new AppError(401, "Invalid token.Please login again!");
+};
+
 const sendErrDev = (err: any, res: Response) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -83,6 +87,9 @@ const globalErrorHandler = (
     //Handle validation error from mongodb
     if (err instanceof mongoose.Error.ValidationError)
       error = handleValidationError(error);
+
+    if (error.name === "JsonWebTokenError")
+      error = handleJsonWebTokenError(error);
 
     sendErrProd(error, res);
   }
