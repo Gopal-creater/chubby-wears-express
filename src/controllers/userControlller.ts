@@ -67,6 +67,7 @@ class userControlller {
 
       res.status(200).json({
         status: "success",
+        totalDocs: users.length,
         data: {
           users,
         },
