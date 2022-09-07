@@ -78,8 +78,7 @@ class userControlller {
     async (req: Request, res: Response, next: NextFunction) => {
       const user = await User.findById(req.params.id);
 
-      if (!user)
-        return next(new AppError(404, "User is not found with the id."));
+      if (!user) return next(new AppError(404, "User not found with the id."));
 
       res.status(200).json({
         status: "success",
