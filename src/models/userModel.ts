@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Query } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import { IUserDocument } from "../interfaces/userInterfaces";
@@ -75,7 +75,7 @@ userSchema.pre("save", function (next) {
 //----------------------------------------------------------------------
 
 //Mongoose document middleware to find all active users---------------
-userSchema.pre(/^find/, function (next) {
+userSchema.pre<Query<IUserDocument[], IUserDocument>>(/^find/, function (next) {
   console.log("Calling");
   this.find({ active: { $ne: false } });
   next();

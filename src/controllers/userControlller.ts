@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IGetUserAuthInfoRequest } from "../interfaces/iGetUserAuthInfoRequest";
 import User from "../models/userModel";
+import ApiFeatures from "../utils/apiFeatures";
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 
@@ -63,7 +64,8 @@ class userControlller {
 
   getUsers = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-      const users = await User.find();
+      const features = new ApiFeatures(User.find(), req.body).filter().pagination().sort().limitFields();
+      const users = await features.query;
 
       res.status(200).json({
         status: "success",
