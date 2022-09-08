@@ -16,7 +16,7 @@ class userControlller {
     return newObj;
   };
 
-  updateUser = catchAsync(
+  updateMe = catchAsync(
     async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
       //Create error if user posts password data
       if (req.body.password || req.body.passwordConfirm) {
@@ -52,7 +52,7 @@ class userControlller {
     }
   );
 
-  deleteUser = catchAsync(
+  deleteMe = catchAsync(
     async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
       await User.findByIdAndUpdate(req?.user?.id, { active: false });
 
