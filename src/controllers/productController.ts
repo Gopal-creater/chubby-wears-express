@@ -1,15 +1,24 @@
 import { Request, Response, NextFunction } from "express";
+import KeyFields from "../interfaces/IApiFeatures";
+import Product from "../models/productModel";
+import ApiFeatures from "../utils/apiFeatures";
 import catchAsync from "../utils/catchAsync";
 
 class productController {
   getAllProduct = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-      // const newProduct = await Product.create(req.body);
+      const features = new ApiFeatures(Product.find(), req.query as KeyFields)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+      const products = await features.query;
 
       res.status(201).json({
         status: "success",
+        results: products.length,
         data: {
-          product: "All products",
+          products,
         },
       });
     }

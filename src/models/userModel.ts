@@ -74,13 +74,12 @@ userSchema.pre("save", function (next) {
 });
 //----------------------------------------------------------------------
 
-//Mongoose document middleware to find all active users---------------
+//Mongoose document middleware to find all active users---------------------------
 userSchema.pre<Query<IUserDocument[], IUserDocument>>(/^find/, function (next) {
-  console.log("Calling");
   this.find({ active: { $ne: false } });
   next();
 });
-//--------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
 //Mongoose instance method to compare password--------------------
 userSchema.methods.comparePassword = async function (

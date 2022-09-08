@@ -26,6 +26,24 @@ class authController {
   createSendToken = (user: any, statusCode: number, res: Response) => {
     const token = this.signToken(user._id);
 
+    //Sending jwt in cookie for security purpose------------------------------
+    const cookieOption = {
+      expires: new Date(
+        Date.now().valueOf() +
+          process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      ),
+      secure: false,
+      httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === "production") cookieOption.secure = true;
+
+    res.cookie("jwt", token, cookieOption);
+    //-----------------------------------------------------------------------
+
+    //Remove password from the output
+    user.password = undefined;
+
     res.status(statusCode).json({
       status: "success",
       token,
