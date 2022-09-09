@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { IUserDocument } from "../interfaces/userInterfaces";
 import { userRoles } from "../constants";
 import crypto from "crypto";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const userSchema = new mongoose.Schema<IUserDocument>({
   name: {
@@ -44,6 +45,9 @@ const userSchema = new mongoose.Schema<IUserDocument>({
     select: false,
   },
 });
+
+//Plugging in the aggregatePaginate
+userSchema.plugin(aggregatePaginate);
 
 //Password validation middleware------------------------------------------
 userSchema.pre("validate", function (next) {
