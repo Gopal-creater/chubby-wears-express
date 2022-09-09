@@ -65,6 +65,8 @@ class userControlller {
 
   getUsers = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
+      const userAggregate = User.aggregate();
+      // User.aggregatePaginate();
       const features = new ApiFeatures(User.find(), req.query as KeyFields)
         .filter()
         .sort()
